@@ -67,19 +67,48 @@ const server = http.createServer((req, res) => {
         // console.log(elementString);
         fs.writeFile(
           `./public/${elementObj.elementName}.html`,
-          JSON.stringify(elementObj),
+          JSON.stringify({ elementObj }, null, "\t"),
           err => {
             if (err) throw err;
 
             console.log(`${elementObj.elementName}.html has been saved!`);
           }
         );
+        // let toHTML = (function() {
+        //   let head = window.document.createElement("head");
+        //   let myCSSHref = "./css/styles.css";
+        //   let cssLink = window.document.createElement("link");
+        //   cssLink.id = cssId;
+        //   cssLink.rel = "stylesheet";
+        //   cssLink.type = "text/css";
+        //   cssLink.href = myCSSHref;
+        //   cssLink.media = "all";
+        //   head.appendChild(cssLink);
+        //   let docBody = window.document.createElement("body");
+        //   let docH1 = window.document.createElement("h1");
+        //   let docH2 = window.document.createElement("h2");
+        //   let docH3 = window.document.createElement("h3");
+        //   let docP = window.document.createElement("p");
+        // })();
+        // fs.writeFile(`./public/${elementObj.elementName}.html`, toHTML, err => {
+        //   if (err) throw err;
+        //   console.log("File has been appended");
+        // });
+        //   req.on("end", () => {
+        //     console.log(body);
+        //   });
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write("success : true");
+        res.end();
       });
-      //   req.on("end", () => {
-      //     console.log(body);
-      //   });
-
       break;
+    case req.url === "/boron.html":
+      fs.readFile("./public/boron.html", (err, fd) => {
+        if (err) throw err;
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(fd);
+        res.end();
+      });
     default:
       fs.readFile("./public/404.html", (err, fd) => {
         if (err) throw err;
