@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const url = require("url");
 const net = require("net");
+const querystring = require("querystring");
 
 // http.get({
 //   hostname: "localhost",
@@ -55,6 +56,29 @@ const server = http.createServer((req, res) => {
         res.write(fd);
         res.end();
       });
+      break;
+    case req.url === "/elements":
+      let body = "";
+      req.on("data", data => {
+        body += data;
+        let elementObj = querystring.parse(body);
+
+        // let elementString = querystring.stringify(elementObj); //can be saved with elemental data
+        // console.log(elementString);
+        fs.writeFile(
+          `./public/${elementObj.elementName}.html`,
+          JSON.stringify(elementObj),
+          err => {
+            if (err) throw err;
+
+            console.log(`${elementObj.elementName}.html has been saved!`);
+          }
+        );
+      });
+      //   req.on("end", () => {
+      //     console.log(body);
+      //   });
+
       break;
     default:
       fs.readFile("./public/404.html", (err, fd) => {
