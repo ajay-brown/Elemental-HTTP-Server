@@ -57,58 +57,61 @@ const server = http.createServer((req, res) => {
         res.end();
       });
       break;
+    case req.url === "/Boron.html":
+      fs.readFile("./public/Boron.html", (err, fd) => {
+        if (err) throw err;
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.write(fd);
+        res.end();
+      });
     case req.url === "/elements":
       let body = "";
       req.on("data", data => {
         body += data;
         let elementObj = querystring.parse(body);
 
-        // let elementString = querystring.stringify(elementObj); //can be saved with elemental data
-        // console.log(elementString);
+        const elementString = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>The Elements - ${
+          elementObj.elementName
+        }</title><link rel="stylesheet" href="/css/styles.css"></head><body><h1>${
+          elementObj.elementName
+        }</h1><h2>${elementObj.elementSymbol}</h2><h3>Atomic number ${
+          elementObj.elementAtomicNumber
+        }</h3>
+            <p>${
+              elementObj.elementDescription
+            }</p><p><a href="/">back</a></p></body> </html>`;
+
         fs.writeFile(
           `./public/${elementObj.elementName}.html`,
-          JSON.stringify({ elementObj }, null, "\t"),
+          elementString,
           err => {
             if (err) throw err;
 
             console.log(`${elementObj.elementName}.html has been saved!`);
           }
         );
-        // let toHTML = (function() {
-        //   let head = window.document.createElement("head");
-        //   let myCSSHref = "./css/styles.css";
-        //   let cssLink = window.document.createElement("link");
-        //   cssLink.id = cssId;
-        //   cssLink.rel = "stylesheet";
-        //   cssLink.type = "text/css";
-        //   cssLink.href = myCSSHref;
-        //   cssLink.media = "all";
-        //   head.appendChild(cssLink);
-        //   let docBody = window.document.createElement("body");
-        //   let docH1 = window.document.createElement("h1");
-        //   let docH2 = window.document.createElement("h2");
-        //   let docH3 = window.document.createElement("h3");
-        //   let docP = window.document.createElement("p");
-        // })();
-        // fs.writeFile(`./public/${elementObj.elementName}.html`, toHTML, err => {
-        //   if (err) throw err;
-        //   console.log("File has been appended");
-        // });
-        //   req.on("end", () => {
-        //     console.log(body);
-        //   });
-        res.writeHead(200, { "Content-Type": "application/json" });
+        fs.readFile("./public/index.html", (err, data) => {
+          if (err) throw err;
+          console.log(data);
+        });
+        fs.appendFile(
+          "./public/index.html",
+          `<ol><li><a href=./${elementObj.elementName}.html>${
+            elementObj.elementName
+          }</a>
+          </li></ol>`,
+          err => {
+            if (err) throw err;
+            console.log("index.html has been updated");
+          }
+        );
+        res.writeHead(200, { "Content-Type": "text/html" });
         res.write("success : true");
         res.end();
       });
+
       break;
-    case req.url === "/boron.html":
-      fs.readFile("./public/boron.html", (err, fd) => {
-        if (err) throw err;
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.write(fd);
-        res.end();
-      });
+
     default:
       fs.readFile("./public/404.html", (err, fd) => {
         if (err) throw err;
@@ -118,25 +121,8 @@ const server = http.createServer((req, res) => {
       });
       break;
   }
-  //   res.end(); //this is necessary
 });
-// server.on("CONNECT", (req, clientSocket, head) => {
-//   console.log("Is connected");
-//   console.log(req, "connecting req");
-//   console.log(head, "head");
-//   console.log("client socket", clientSocket);
-//   const serverUrl = url.parse(`http://${req.url}`);
-//   clientSocket.write("HTTP/1.1 200 OK \n\n");
-//   serverSocket.write(head);
-//   serverSocket.pipe(clientSocket);
-//   clientSocket.pipe(serverSocket);
-// });
-// server.listen(8080, () => {
-//   const options = {
-//     port: 8080,
-//     method: "CONNECT"
-//   };
-// });
+
 server.listen(8080, () => {
   console.log("Server is listening on port 8080");
 });
